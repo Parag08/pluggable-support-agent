@@ -1,0 +1,74 @@
+{
+  "_note": "Fixed customers/orders that cover specific agent paths. Used by tests, evals and manual QA. Day offsets are relative to seed time.",
+  "customers": [
+    {"id": "cus_9001", "first_name": "Maya", "last_name": "Chen", "email": "maya.chen@example.com", "is_guest": false, "identity_subject": "idp|scenario-maya", "created_days_before_history": 30},
+    {"id": "cus_9002", "first_name": "Daniel", "last_name": "Okafor", "email": "daniel.okafor@example.com", "is_guest": false, "identity_subject": "idp|scenario-daniel", "created_days_before_history": 60},
+    {"id": "cus_9003", "first_name": "Priya", "last_name": "Sharma", "email": "priya.sharma@example.com", "is_guest": true, "identity_subject": null, "created_days_before_history": 5}
+  ],
+  "orders": [
+    {
+      "id": "SS90001", "customer_id": "cus_9001", "scenario": "return_eligible",
+      "status": "delivered", "placed_days_ago": 14, "delivered_days_ago": 10,
+      "items": [{"handle": "cloudstride-runner-women", "color": "Sand", "size_us": 7.5, "width": "regular", "quantity": 1}]
+    },
+    {
+      "id": "SS90002", "customer_id": "cus_9001", "scenario": "return_window_expired",
+      "status": "delivered", "placed_days_ago": 50, "delivered_days_ago": 45,
+      "items": [{"handle": "aria-ballet-flat", "color": "Black", "size_us": 7.0, "width": "regular", "quantity": 1}]
+    },
+    {
+      "id": "SS90003", "customer_id": "cus_9001", "scenario": "mixed_final_sale",
+      "status": "delivered", "placed_days_ago": 9, "delivered_days_ago": 5, "discount_code": "WELCOME10",
+      "items": [
+        {"handle": "sol-sandal", "color": "Tan", "size_us": 7.0, "width": "regular", "quantity": 1},
+        {"handle": "breeze-knit-slip-on", "color": "Oat", "size_us": 7.0, "width": "regular", "quantity": 1}
+      ]
+    },
+    {
+      "id": "SS90004", "customer_id": "cus_9001", "scenario": "in_transit",
+      "status": "shipped", "placed_days_ago": 3, "shipped_days_ago": 2,
+      "items": [{"handle": "summit-chelsea-boot", "color": "Black", "size_us": 7.5, "width": "regular", "quantity": 1}]
+    },
+    {
+      "id": "SS90011", "customer_id": "cus_9001", "scenario": "cancelled",
+      "status": "cancelled", "placed_days_ago": 20,
+      "items": [{"handle": "coast-espadrille", "color": "Natural", "size_us": 7.0, "width": "regular", "quantity": 1}]
+    },
+    {
+      "id": "SS90005", "customer_id": "cus_9002", "scenario": "modifiable_before_fulfilment",
+      "status": "paid", "placed_days_ago": 0,
+      "items": [{"handle": "trailmate-hiker", "color": "Olive", "size_us": 10.0, "width": "regular", "quantity": 1}]
+    },
+    {
+      "id": "SS90006", "customer_id": "cus_9002", "scenario": "fulfilling_cannot_modify",
+      "status": "fulfilling", "placed_days_ago": 1,
+      "items": [{"handle": "nimbus-recovery-slide", "color": "Black", "size_us": 10.0, "width": "regular", "quantity": 2}]
+    },
+    {
+      "id": "SS90007", "customer_id": "cus_9002", "scenario": "exchange_in_progress",
+      "status": "delivered", "placed_days_ago": 16, "delivered_days_ago": 12,
+      "items": [{"handle": "pace-walker", "color": "White", "size_us": 10.0, "width": "regular", "quantity": 1}],
+      "return": {"type": "exchange", "status": "label_sent", "reason": "too_narrow", "created_days_ago": 9,
+                 "refund_status": "not_applicable", "exchange_to": {"color": "White", "size_us": 10.0, "width": "wide"}}
+    },
+    {
+      "id": "SS90008", "customer_id": "cus_9002", "scenario": "refund_completed",
+      "status": "delivered", "placed_days_ago": 32, "delivered_days_ago": 27,
+      "items": [{"handle": "metro-oxford", "color": "Black", "size_us": 9.0, "width": "regular", "quantity": 1}],
+      "return": {"type": "return", "status": "completed", "reason": "too_large", "created_days_ago": 24,
+                 "refund_status": "refunded", "refunded_days_ago": 15}
+    },
+    {
+      "id": "SS90009", "customer_id": "cus_9002", "scenario": "refund_processing",
+      "status": "delivered", "placed_days_ago": 13, "delivered_days_ago": 8,
+      "items": [{"handle": "harbour-loafer", "color": "Cognac", "size_us": 10.0, "width": "regular", "quantity": 1}],
+      "return": {"type": "return", "status": "received", "reason": "uncomfortable", "created_days_ago": 6,
+                 "refund_status": "processing"}
+    },
+    {
+      "id": "SS90010", "customer_id": "cus_9003", "scenario": "guest_order",
+      "status": "shipped", "placed_days_ago": 4, "shipped_days_ago": 3,
+      "items": [{"handle": "cloudstride-runner-women", "color": "Black", "size_us": 8.0, "width": "wide", "quantity": 1}]
+    }
+  ]
+}

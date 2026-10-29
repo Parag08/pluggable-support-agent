@@ -1,0 +1,13 @@
+{
+  "_note": "Customer-facing policy facts used by the shipping_policy handler. Placeholders \u2014 replace with the company's real policies (PRD \u00a711). Monetary thresholds and the return window come from .env.",
+  "ships_to": [
+    "United States"
+  ],
+  "delivery_time_business_days": "2-6",
+  "return_conditions": "Unworn outdoors, in the original box, with tags attached.",
+  "final_sale": "Items marked Final Sale cannot be returned or exchanged.",
+  "exchange_policy": "Size, width and color exchanges are free, one exchange per item.",
+  "warranty": "6 months against manufacturing defects.",
+  "human_support_hours": "Mon-Fri, 9am-6pm ET",
+  "refund_timing": "within 5-10 business days of receiving your return"
+}

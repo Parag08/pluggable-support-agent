@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acme Footwear</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap bar">
+      <a class="logo" href="/"><span class="mark">A</span> Acme Footwear</a>
+      <nav><a href="#shop">Shop</a><a href="#">Stores</a><a href="#">Returns</a></nav>
+      <button id="account" class="account">Sign in</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">New season</p>
+      <h1>Comfort that keeps up<br>with your day.</h1>
+      <p class="lede">Cushioned runners, easy loafers and sturdy boots. Free shipping over $100, 30-day returns.</p>
+      <a class="cta" href="#shop">Shop the collection</a>
+    </div>
+  </section>
+
+  <main id="shop" class="wrap">
+    <h2>Our shoes</h2>
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </main>
+
+  <footer><div class="wrap">Acme Footwear is a fictional store for demonstrating the support agent.</div></footer>
+
+  <!-- Acme's own login. In a real site this is the existing login page. -->
+  <div id="login" class="modal" hidden>
+    <div class="card">
+      <h3>Sign in to Acme</h3>
+      <p>Demo accounts (from the seed data):</p>
+      <button class="acct" data-id="cus_9001"><b>Maya</b><span>cus_9001 · member</span></button>
+      <button class="acct" data-id="cus_9002"><b>Daniel</b><span>cus_9002 · member</span></button>
+      <button id="login-cancel" class="link">Cancel</button>
+    </div>
+  </div>
+
+  <script src="widget.js"></script>
+</body>
+</html>

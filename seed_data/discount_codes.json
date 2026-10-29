@@ -1,0 +1,5 @@
+[
+  {"code": "WELCOME10", "description": "10% off your first order", "percent_off": "10.00", "amount_off": null, "min_subtotal": null, "starts_at_days_ago": 365, "ends_in_days": 365, "is_active": true},
+  {"code": "STEPUP20", "description": "$20 off orders over $150", "percent_off": null, "amount_off": "20.00", "min_subtotal": "150.00", "starts_at_days_ago": 90, "ends_in_days": 30, "is_active": true},
+  {"code": "SUMMER15", "description": "15% off summer styles (expired)", "percent_off": "15.00", "amount_off": null, "min_subtotal": null, "starts_at_days_ago": 200, "ends_in_days": -60, "is_active": false}
+]

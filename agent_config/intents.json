@@ -1,0 +1,210 @@
+{
+  "_note": "Intent catalog. `type` (public/protected) is fixed here — the classifier never decides whether identity is needed. `kind`: answer = handler + reply; action = write that needs confirmation; escalate = always hand to a human; decline = out of scope. `requires` lists the CommercePort capabilities an intent needs; if the company's adapter lacks one, the agent hands the request to a human instead of attempting it.",
+  "intents": [
+    {
+      "name": "size_advice",
+      "label": "Size help",
+      "type": "public",
+      "kind": "answer",
+      "handler": "size_advice",
+      "required": [
+        "product",
+        "reference_size"
+      ],
+      "requires": [
+        "catalog.read",
+        "size_chart.read"
+      ],
+      "description": "Which size or width to buy in a {{BRAND_NAME}} product, size conversions (US/UK/EU/cm), fit questions."
+    },
+    {
+      "name": "product_question",
+      "label": "Product info",
+      "type": "public",
+      "kind": "answer",
+      "handler": "product_info",
+      "required": [
+        "question"
+      ],
+      "requires": [
+        "catalog.read"
+      ],
+      "description": "Questions about a product's materials, features, care, comfort, waterproofing, price or colors."
+    },
+    {
+      "name": "stock_check",
+      "label": "Check stock",
+      "type": "public",
+      "kind": "answer",
+      "handler": "stock_check",
+      "required": [
+        "product",
+        "size"
+      ],
+      "requires": [
+        "catalog.read"
+      ],
+      "description": "Whether a product is in stock in a size/width/color, or when it will be restocked."
+    },
+    {
+      "name": "shipping_policy",
+      "label": "Shipping & returns policy",
+      "type": "public",
+      "kind": "answer",
+      "handler": "shipping_policy",
+      "required": [],
+      "description": "General shipping costs, delivery times, where we ship, and the general return/exchange/refund/warranty policy (not about a specific order)."
+    },
+    {
+      "name": "store_info",
+      "label": "Find a store",
+      "type": "public",
+      "kind": "answer",
+      "handler": "store_info",
+      "required": [],
+      "requires": [
+        "stores.read"
+      ],
+      "description": "Store locations, opening hours, in-store try-on."
+    },
+    {
+      "name": "discount_code",
+      "label": "Discount code",
+      "type": "public",
+      "kind": "answer",
+      "handler": "discount_code",
+      "required": [
+        "discount_code"
+      ],
+      "requires": [
+        "discounts.read"
+      ],
+      "description": "Whether a specific discount code is valid or why it isn't working."
+    },
+    {
+      "name": "track_order",
+      "label": "Track my order",
+      "type": "protected",
+      "kind": "answer",
+      "handler": "track_order",
+      "required": [
+        "order_id"
+      ],
+      "requires": [
+        "orders.read"
+      ],
+      "description": "Status, tracking or delivery date of the customer's own order."
+    },
+    {
+      "name": "refund_status",
+      "label": "Refund status",
+      "type": "protected",
+      "kind": "answer",
+      "handler": "refund_status",
+      "required": [
+        "order_id"
+      ],
+      "requires": [
+        "orders.read"
+      ],
+      "description": "Status or timing of a refund for the customer's own order or return."
+    },
+    {
+      "name": "return_request",
+      "label": "Return an item",
+      "type": "protected",
+      "kind": "action",
+      "handler": "create_return",
+      "required": [
+        "order_id",
+        "order_item_id",
+        "return_reason"
+      ],
+      "requires": [
+        "orders.read",
+        "returns.write"
+      ],
+      "description": "The customer wants to send an item back for a refund."
+    },
+    {
+      "name": "exchange_request",
+      "label": "Exchange an item",
+      "type": "protected",
+      "kind": "action",
+      "handler": "create_exchange",
+      "required": [
+        "order_id",
+        "order_item_id",
+        "exchange_target"
+      ],
+      "requires": [
+        "orders.read",
+        "catalog.read",
+        "exchanges.write"
+      ],
+      "description": "The customer wants to swap an item for a different size, width or color."
+    },
+    {
+      "name": "cancel_or_modify_order",
+      "label": "Cancel or change an order",
+      "type": "protected",
+      "kind": "action",
+      "handler": "cancel_order",
+      "required": [
+        "order_id",
+        "change_type"
+      ],
+      "requires": [
+        "orders.read",
+        "orders.cancel"
+      ],
+      "description": "Cancel an order, or change its address or items."
+    },
+    {
+      "name": "warranty_claim",
+      "label": "Faulty product",
+      "type": "protected",
+      "kind": "escalate",
+      "escalation_reason": "warranty",
+      "escalation_priority": "normal",
+      "required": [],
+      "requires": [
+        "orders.read"
+      ],
+      "description": "A product is defective or broke (e.g. sole came off, stitching failed)."
+    },
+    {
+      "name": "human_handoff",
+      "label": "Talk to a person",
+      "type": "public",
+      "kind": "escalate",
+      "escalation_reason": "customer_request",
+      "escalation_priority": "normal",
+      "required": [],
+      "description": "The customer asks for a human, agent, or person."
+    },
+    {
+      "name": "safety_or_legal",
+      "label": "Safety or legal",
+      "type": "public",
+      "kind": "escalate",
+      "escalation_reason": "safety_legal",
+      "escalation_priority": "urgent",
+      "required": [],
+      "description": "Injury, allergic reaction, product safety issue, legal threats, chargebacks, regulatory complaints."
+    },
+    {
+      "name": "out_of_scope",
+      "label": "Other",
+      "type": "public",
+      "kind": "decline",
+      "required": [],
+      "description": "Anything unrelated to {{BRAND_NAME}} shoes, orders or stores (homework, coding, general chat, politics, other companies)."
+    }
+  ],
+  "write_intents_need_higher_confidence": [
+    "return_request",
+    "exchange_request",
+    "cancel_or_modify_order"
+  ]
+}

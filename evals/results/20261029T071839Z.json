@@ -1,0 +1,160 @@
+[
+  {
+    "case_id": "MI-02",
+    "trial": 1,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "say: What size should I get?",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "size_advice",
+          "confidence": 0.82,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 0,
+          "reply": "Which Acme Footwear shoe are you asking about?",
+          "turn_id": "9c764bcd-96d1-42aa-96af-dff670471527"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "ask_product",
+            "actual": "Which Acme Footwear shoe are you asking about?",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "TF-01",
+    "trial": 1,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "say: Where are your stores?",
+        "actual": {
+          "outcome": "escalated",
+          "reason_code": "LLM_ERROR",
+          "escalation_reason": "classifier_contract_violation",
+          "handler": null,
+          "intent": null,
+          "confidence": null,
+          "stages": [
+            "preprocess",
+            "classify"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 0,
+          "reply": "Sorry, something went wrong on my side. I've passed your conversation to our support team and someone will follow up.",
+          "turn_id": "36db223d-9692-49e9-83a7-757375a95e94"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "escalated",
+            "actual": "escalated",
+            "pass": true
+          },
+          {
+            "criterion": "reason code",
+            "expected": "LLM_ERROR",
+            "actual": "LLM_ERROR",
+            "pass": true
+          },
+          {
+            "criterion": "escalation",
+            "expected": "classifier_contract_violation",
+            "actual": "classifier_contract_violation",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "contract_violation",
+            "actual": "Sorry, something went wrong on my side. I've passed your conversation to our sup",
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "TF-02",
+    "trial": 1,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "say: Where are your stores?",
+        "actual": {
+          "outcome": "escalated",
+          "reason_code": "NOT_JSON",
+          "escalation_reason": "classifier_contract_violation",
+          "handler": null,
+          "intent": null,
+          "confidence": null,
+          "stages": [
+            "preprocess",
+            "classify"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 0,
+          "reply": "Sorry, something went wrong on my side. I've passed your conversation to our support team and someone will follow up.",
+          "turn_id": "fd04dfde-158d-4b2f-a4bc-f31c2675f859"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "escalated",
+            "actual": "escalated",
+            "pass": true
+          },
+          {
+            "criterion": "reason code",
+            "expected": "NOT_JSON",
+            "actual": "NOT_JSON",
+            "pass": true
+          },
+          {
+            "criterion": "escalation",
+            "expected": "classifier_contract_violation",
+            "actual": "classifier_contract_violation",
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  }
+]
