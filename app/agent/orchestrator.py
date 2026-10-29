@@ -70,6 +70,9 @@ class _Turn:
     identity_ok: bool
     state: dict[str, Any]
     info: dict[str, Any] = field(default_factory=dict)  # summary fields for the `turns` row
+    # This turn's classification was a write intent below CLASSIFIER_MIN_CONFIDENCE_WRITE: confirm the
+    # intent before policy can produce a confirmation card (asking for a missing field is still fine).
+    write_intent_unsure: bool = False
 
 
 class SupportAgent:
@@ -249,11 +252,10 @@ class SupportAgent:
                        if self.config.intents[i].kind != "decline"]
             return self._finish(t, TurnOutcome.CLARIFY, self.config.template("clarify"),
                                 payload={"type": "quick_replies", "quick_replies": replies})
-        if cls.intent in self.config.write_intents and cls.confidence < self.s.classifier_min_confidence_write:
-            label = spec.label.lower()
-            return self._finish(t, TurnOutcome.CLARIFY, self.config.template("confirm_intent", intent_label=label),
-                                payload={"type": "quick_replies",
-                                         "quick_replies": [{"label": f"Yes, {label}"}, {"label": "No"}]})
+        # The higher bar for write intents is applied in _process, right before policy: asking for a
+        # missing field (e.g. the order number) is harmless even if the intent is slightly off.
+        t.write_intent_unsure = (cls.intent in self.config.write_intents
+                                 and cls.confidence < self.s.classifier_min_confidence_write)
 
         t.state["queued_intents"] = [i for i in cls.secondary_intents if i != cls.intent]
         return self._process(t, spec, cls.entities)
@@ -295,6 +297,11 @@ class SupportAgent:
         t.info["missing_fields"] = v.missing or None
 
         if ask and spec.kind != "escalate":
+            # Eligibility first: if what is already known rules the request out (e.g. the order is past
+            # the return window), deny now instead of asking for details that can't change the answer.
+            early = self._precheck(t, spec, v)
+            if early is not None:
+                return self._apply_decision(t, spec, v, early)
             attempts[ask] = attempts.get(ask, 0) + 1
             if attempts[ask] > self.s.max_slot_attempts:
                 return self._escalate(t, EscalationReason.REPEATED_FAILURE, EscalationPriority.NORMAL,
@@ -303,6 +310,12 @@ class SupportAgent:
             options = v.quick_replies.get(ask)
             return self._finish(t, TurnOutcome.SLOT_REQUEST, self.config.template(v.invalid.get(ask) or f"ask_{ask}"),
                                 payload={"type": "quick_replies", "quick_replies": options} if options else None)
+
+        if t.write_intent_unsure:
+            label = spec.label.lower()
+            return self._finish(t, TurnOutcome.CLARIFY, self.config.template("confirm_intent", intent_label=label),
+                                payload={"type": "quick_replies",
+                                         "quick_replies": [{"label": f"Yes, {label}"}, {"label": "No"}]})
 
         # --- 3. policy / authorization --------------------------------------
         with rec.step(PipelineStage.POLICY,
@@ -353,6 +366,21 @@ class SupportAgent:
             return self._finish(t, TurnOutcome.FALLBACK, self.config.template("fallback_answered"),
                                 payload=self._handoff_offer(), error=";".join(failures))
         return self._finish(t, TurnOutcome.ANSWERED, run.reply, payload=self._queued_offer(t))
+
+    def _precheck(self, t: _Turn, spec: IntentSpec, v: Validation) -> PolicyDecision | None:
+        """Policy stage run early, while fields are still missing. Returns a denial, or None to keep asking."""
+        decision = self.policy.precheck_eligibility(spec, v, customer_id=t.session.customer_id, now=t.now)
+        if decision is None:
+            return None
+        with t.rec.step(PipelineStage.POLICY,
+                        input={"intent": spec.name, "slots": v.slots, "identity_valid": t.identity_ok,
+                               "precheck": True},
+                        params={"policy_config_version": self.s.policy_config_version,
+                                "return_window_days": self.s.return_window_days}) as st:
+            st.output = decision.to_log()
+            st.status = StepStatus.SHORT_CIRCUIT
+        t.info.update(policy_outcome=decision.outcome, policy_reason_code=decision.reason_code)
+        return decision
 
     def _apply_decision(self, t: _Turn, spec: IntentSpec, v: Validation, d: PolicyDecision) -> AgentReply:
         if d.outcome == PolicyOutcome.AUTH_REQUIRED:
