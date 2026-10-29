@@ -1,0 +1,58 @@
+[
+  {
+    "id": "str_001",
+    "name": "Acme Footwear Mercer Street",
+    "address_line": "214 Mercer Lane",
+    "city": "New York",
+    "region": "NY",
+    "postal_code": "10012",
+    "country": "US",
+    "phone": "+1-555-0101",
+    "latitude": "40.725600",
+    "longitude": "-73.998100",
+    "opening_hours": {"mon": "10:00-20:00", "tue": "10:00-20:00", "wed": "10:00-20:00", "thu": "10:00-21:00", "fri": "10:00-21:00", "sat": "10:00-21:00", "sun": "11:00-18:00"},
+    "offers_try_on": true
+  },
+  {
+    "id": "str_002",
+    "name": "Acme Footwear Union Square",
+    "address_line": "88 Garnet Street",
+    "city": "San Francisco",
+    "region": "CA",
+    "postal_code": "94108",
+    "country": "US",
+    "phone": "+1-555-0102",
+    "latitude": "37.787900",
+    "longitude": "-122.407500",
+    "opening_hours": {"mon": "10:00-19:00", "tue": "10:00-19:00", "wed": "10:00-19:00", "thu": "10:00-19:00", "fri": "10:00-20:00", "sat": "10:00-20:00", "sun": "11:00-18:00"},
+    "offers_try_on": true
+  },
+  {
+    "id": "str_003",
+    "name": "Acme Footwear Riverwalk",
+    "address_line": "1200 Willow Avenue, Suite 140",
+    "city": "Chicago",
+    "region": "IL",
+    "postal_code": "60611",
+    "country": "US",
+    "phone": "+1-555-0103",
+    "latitude": "41.892100",
+    "longitude": "-87.624200",
+    "opening_hours": {"mon": "10:00-19:00", "tue": "10:00-19:00", "wed": "10:00-19:00", "thu": "10:00-19:00", "fri": "10:00-20:00", "sat": "10:00-20:00", "sun": "12:00-17:00"},
+    "offers_try_on": true
+  },
+  {
+    "id": "str_004",
+    "name": "Acme Footwear Outlet Austin",
+    "address_line": "5400 Cedar Park Road",
+    "city": "Austin",
+    "region": "TX",
+    "postal_code": "78731",
+    "country": "US",
+    "phone": "+1-555-0104",
+    "latitude": "30.351300",
+    "longitude": "-97.761400",
+    "opening_hours": {"mon": "closed", "tue": "11:00-19:00", "wed": "11:00-19:00", "thu": "11:00-19:00", "fri": "11:00-20:00", "sat": "10:00-20:00", "sun": "11:00-17:00"},
+    "offers_try_on": false
+  }
+]

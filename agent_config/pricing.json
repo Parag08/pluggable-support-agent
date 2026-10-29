@@ -1,0 +1,7 @@
+{
+  "_note": "USD per token for each model ID you use (the demo model: Nous Portal /models endpoint, fetched 2026-10-29). Used to compute llm_calls.cost_usd. Unknown models get cost NULL.",
+  "deepseek/deepseek-v4.1-flash-1017": {
+    "prompt": "0.0000003000",
+    "completion": "0.0000012000"
+  }
+}

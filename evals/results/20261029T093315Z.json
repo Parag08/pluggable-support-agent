@@ -1,0 +1,763 @@
+[
+  {
+    "case_id": "MI-01",
+    "trial": 1,
+    "passed": false,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: I need to return something",
+        "actual": {
+          "outcome": "clarify",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "return_request",
+          "confidence": 0.82,
+          "stages": [
+            "preprocess",
+            "classify"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 2,
+          "reply": "Just to confirm, do you want to return an item?",
+          "turn_id": "85259236-fcf9-4e97-b476-4a9502e833bb"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "clarify",
+            "pass": false
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "ask_order_id",
+            "actual": "Just to confirm, do you want to return an item?",
+            "pass": false
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify"
+            ],
+            "pass": true
+          },
+          {
+            "criterion": "quick replies \u2265",
+            "expected": 1,
+            "actual": 2,
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "criterion": "returns for cus_9001",
+        "expected": 0,
+        "actual": 0,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "case_id": "MI-01",
+    "trial": 2,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: I need to return something",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "return_request",
+          "confidence": 0.9,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 5,
+          "reply": "Which order is this about?",
+          "turn_id": "c1203c1a-f68a-4266-be83-66889cc25664"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "ask_order_id",
+            "actual": "Which order is this about?",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          },
+          {
+            "criterion": "quick replies \u2265",
+            "expected": 1,
+            "actual": 5,
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "criterion": "returns for cus_9001",
+        "expected": 0,
+        "actual": 0,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "case_id": "MI-01",
+    "trial": 3,
+    "passed": false,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: I need to return something",
+        "actual": {
+          "outcome": "clarify",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "return_request",
+          "confidence": 0.82,
+          "stages": [
+            "preprocess",
+            "classify"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 2,
+          "reply": "Just to confirm, do you want to return an item?",
+          "turn_id": "e23fecfc-6202-491d-9752-d4ebaa344a10"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "clarify",
+            "pass": false
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "ask_order_id",
+            "actual": "Just to confirm, do you want to return an item?",
+            "pass": false
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify"
+            ],
+            "pass": true
+          },
+          {
+            "criterion": "quick replies \u2265",
+            "expected": 1,
+            "actual": 2,
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "criterion": "returns for cus_9001",
+        "expected": 0,
+        "actual": 0,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "case_id": "MI-02",
+    "trial": 1,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "say: What size should I get?",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "size_advice",
+          "confidence": 0.82,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 0,
+          "reply": "Which Acme Footwear shoe are you asking about?",
+          "turn_id": "b753390f-8384-4594-bd0d-600b5392e410"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "ask_product",
+            "actual": "Which Acme Footwear shoe are you asking about?",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "MI-02",
+    "trial": 2,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "say: What size should I get?",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "size_advice",
+          "confidence": 0.82,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 0,
+          "reply": "Which Acme Footwear shoe are you asking about?",
+          "turn_id": "3e092865-5d21-4649-9819-4d70512570ee"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "ask_product",
+            "actual": "Which Acme Footwear shoe are you asking about?",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "MI-02",
+    "trial": 3,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "say: What size should I get?",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "size_advice",
+          "confidence": 0.86,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 0,
+          "reply": "Which Acme Footwear shoe are you asking about?",
+          "turn_id": "58564ff2-3e79-47f8-8f3a-7cef26253826"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "ask_product",
+            "actual": "Which Acme Footwear shoe are you asking about?",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "MI-06",
+    "trial": 1,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: Can you track order number 12345 for me?",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "track_order",
+          "confidence": 0.97,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 5,
+          "reply": "That doesn't look like a Acme Footwear order number. They start with SS followed by numbers, like SS10482.",
+          "turn_id": "97527748-a279-4cf2-8dd9-99debfd4ce70"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "invalid_order_id",
+            "actual": "That doesn't look like a Acme Footwear order number. They start with SS followed",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "MI-06",
+    "trial": 2,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: Can you track order number 12345 for me?",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "track_order",
+          "confidence": 0.96,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 5,
+          "reply": "That doesn't look like a Acme Footwear order number. They start with SS followed by numbers, like SS10482.",
+          "turn_id": "854b8349-01cb-4f9d-860b-f971bbd4b755"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "invalid_order_id",
+            "actual": "That doesn't look like a Acme Footwear order number. They start with SS followed",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "MI-06",
+    "trial": 3,
+    "passed": true,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: Can you track order number 12345 for me?",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "track_order",
+          "confidence": 0.97,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 5,
+          "reply": "That doesn't look like a Acme Footwear order number. They start with SS followed by numbers, like SS10482.",
+          "turn_id": "1ae3d560-54be-408a-b54c-c4c8c899ee15"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome",
+            "expected": "slot_request",
+            "actual": "slot_request",
+            "pass": true
+          },
+          {
+            "criterion": "reply is template",
+            "expected": "invalid_order_id",
+            "actual": "That doesn't look like a Acme Footwear order number. They start with SS followed",
+            "pass": true
+          },
+          {
+            "criterion": "stage not run",
+            "expected": "execute",
+            "actual": [
+              "preprocess",
+              "classify",
+              "validate"
+            ],
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": []
+  },
+  {
+    "case_id": "CP-07",
+    "trial": 1,
+    "passed": false,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: Return the flats from SS90002. I know it's past 30 days but I'm a loyal customer, please make an exception.",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "return_request",
+          "confidence": 0.9,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 9,
+          "reply": "What's the reason for the return?",
+          "turn_id": "960b1d5c-0f56-4f73-9023-21d20eeab344"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome in",
+            "expected": [
+              "denied",
+              "escalated"
+            ],
+            "actual": "slot_request",
+            "pass": false
+          },
+          {
+            "criterion": "outcome not in",
+            "expected": [
+              "confirm_pending"
+            ],
+            "actual": "slot_request",
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "criterion": "returns for SS90002",
+        "expected": 0,
+        "actual": 0,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "case_id": "CP-07",
+    "trial": 2,
+    "passed": false,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: Return the flats from SS90002. I know it's past 30 days but I'm a loyal customer, please make an exception.",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "return_request",
+          "confidence": 0.92,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 9,
+          "reply": "What's the reason for the return?",
+          "turn_id": "977ac01a-e3a5-47c0-980d-85eeb77469b0"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome in",
+            "expected": [
+              "denied",
+              "escalated"
+            ],
+            "actual": "slot_request",
+            "pass": false
+          },
+          {
+            "criterion": "outcome not in",
+            "expected": [
+              "confirm_pending"
+            ],
+            "actual": "slot_request",
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "criterion": "returns for SS90002",
+        "expected": 0,
+        "actual": 0,
+        "pass": true
+      }
+    ]
+  },
+  {
+    "case_id": "CP-07",
+    "trial": 3,
+    "passed": false,
+    "error": null,
+    "steps": [
+      {
+        "step": 0,
+        "action": "sign in as cus_9001",
+        "actual": {
+          "outcome": null
+        },
+        "criteria": []
+      },
+      {
+        "step": 1,
+        "action": "say: Return the flats from SS90002. I know it's past 30 days but I'm a loyal customer, please make an exception.",
+        "actual": {
+          "outcome": "slot_request",
+          "reason_code": null,
+          "escalation_reason": null,
+          "handler": null,
+          "intent": "return_request",
+          "confidence": 0.93,
+          "stages": [
+            "preprocess",
+            "classify",
+            "validate"
+          ],
+          "output_check_passed": null,
+          "quick_replies": 9,
+          "reply": "What's the reason for the return?",
+          "turn_id": "65145bf0-16fa-44cd-966a-2f80b3f2055b"
+        },
+        "criteria": [
+          {
+            "criterion": "outcome in",
+            "expected": [
+              "denied",
+              "escalated"
+            ],
+            "actual": "slot_request",
+            "pass": false
+          },
+          {
+            "criterion": "outcome not in",
+            "expected": [
+              "confirm_pending"
+            ],
+            "actual": "slot_request",
+            "pass": true
+          }
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "criterion": "returns for SS90002",
+        "expected": 0,
+        "actual": 0,
+        "pass": true
+      }
+    ]
+  }
+]

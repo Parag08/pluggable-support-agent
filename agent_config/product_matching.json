@@ -1,0 +1,10 @@
+{
+  "_note": "Vocabulary for resolving a customer's product description to a catalog item (stage 2).",
+  "gender_words": {
+    "women": ["women", "womens", "women's", "woman", "ladies", "lady", "female", "her"],
+    "men": ["men", "mens", "men's", "man", "male", "his"]
+  },
+  "stop_words": ["the", "a", "an", "for", "in", "my", "pair", "of", "shoe", "shoes", "one", "ones"],
+  "fuzzy_cutoff": 0.6,
+  "max_suggestions": 5
+}

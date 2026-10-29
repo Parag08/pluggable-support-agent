@@ -1,0 +1,30 @@
+{
+  "first_names": [
+    "Maya", "Daniel", "Priya", "Lucas", "Aisha", "Ethan", "Sofia", "Noah", "Mei", "Omar",
+    "Hannah", "Diego", "Grace", "Kwame", "Elena", "Ravi", "Chloe", "Mateo", "Zara", "Liam",
+    "Ana", "Kenji", "Fatima", "Samuel", "Isla", "Arjun", "Leila", "Jonah", "Nadia", "Theo"
+  ],
+  "last_names": [
+    "Chen", "Okafor", "Sharma", "Martin", "Rahman", "Brooks", "Rossi", "Kim", "Lin", "Haddad",
+    "Fischer", "Alvarez", "Nguyen", "Mensah", "Petrova", "Iyer", "Dubois", "Garcia", "Ali", "Walsh",
+    "Silva", "Tanaka", "Hussain", "Cohen", "Murray", "Patel", "Karimi", "Reed", "Novak", "Park"
+  ],
+  "streets": [
+    "Maple Avenue", "Oak Street", "Pine Road", "Cedar Lane", "Elm Drive", "Birch Court",
+    "Willow Way", "Spruce Street", "Aspen Boulevard", "Juniper Place", "Magnolia Terrace", "Hawthorn Row"
+  ],
+  "cities": [
+    {"city": "New York", "region": "NY", "postal_prefix": "100"},
+    {"city": "Brooklyn", "region": "NY", "postal_prefix": "112"},
+    {"city": "San Francisco", "region": "CA", "postal_prefix": "941"},
+    {"city": "Los Angeles", "region": "CA", "postal_prefix": "900"},
+    {"city": "Chicago", "region": "IL", "postal_prefix": "606"},
+    {"city": "Austin", "region": "TX", "postal_prefix": "787"},
+    {"city": "Seattle", "region": "WA", "postal_prefix": "981"},
+    {"city": "Boston", "region": "MA", "postal_prefix": "021"},
+    {"city": "Denver", "region": "CO", "postal_prefix": "802"},
+    {"city": "Atlanta", "region": "GA", "postal_prefix": "303"}
+  ],
+  "country": "US",
+  "phone_template": "+1-555-01{nn:02d}"
+}

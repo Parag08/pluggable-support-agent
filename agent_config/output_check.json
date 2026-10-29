@@ -1,0 +1,13 @@
+{
+  "_note": "Deterministic checks on every model-written reply (pipeline stage 6). A failed check replaces the reply with a template and flags the turn.",
+  "banned_phrases": [
+    "diagnos", "you have plantar", "you have a bunion", "will cure", "treatment for", "medical advice",
+    "full refund guaranteed", "i guarantee", "i promise", "free of charge forever",
+    "system prompt", "my instructions", "as an ai language model"
+  ],
+  "card_number_pattern": "\\b(?:\\d[ -]?){12,18}\\d\\b",
+  "email_pattern": "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+  "money_pattern": "\\$\\s?(\\d+(?:,\\d{3})*(?:\\.\\d{1,2})?)",
+  "order_id_pattern": "\\bSS\\d{5,}\\b",
+  "return_id_pattern": "\\bRMA\\d+\\b"
+}

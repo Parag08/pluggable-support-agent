@@ -1,0 +1,10 @@
+{
+  "_note": "Applied to every customer message before it is logged or sent to any model. `luhn: true` redacts only digit runs that pass the Luhn check (real card numbers).",
+  "rules": [
+    {"name": "card_number", "pattern": "\\b(?:\\d[ -]?){12,18}\\d\\b", "luhn": true, "replacement": "[REDACTED_CARD]"},
+    {"name": "card_security_code", "pattern": "(?i)\\b(?:cvv|cvc|cvv2|security code)\\W{0,3}\\d{3,4}\\b", "luhn": false, "replacement": "[REDACTED_CVV]"},
+    {"name": "us_ssn", "pattern": "\\b\\d{3}-\\d{2}-\\d{4}\\b", "luhn": false, "replacement": "[REDACTED_SSN]"},
+    {"name": "password", "pattern": "(?i)\\b(?:password|passcode|pwd)\\s*(?:is|:|=)\\s*\\S+", "luhn": false, "replacement": "[REDACTED_PASSWORD]"}
+  ],
+  "strip_characters": ["​", "‌", "‍", "⁠", "﻿", "‪", "‫", "‬", "‭", "‮"]
+}

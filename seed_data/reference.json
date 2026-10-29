@@ -1,0 +1,40 @@
+{
+  "size_ranges_us": {
+    "women": {"min": 5.0, "max": 11.0, "step": 0.5},
+    "men": {"min": 7.0, "max": 13.0, "step": 0.5},
+    "unisex": {"min": 5.0, "max": 13.0, "step": 0.5}
+  },
+  "stock_qty_range": [1, 40],
+  "restock_days_range": [7, 45],
+  "items_per_order_weights": {"1": 70, "2": 22, "3": 8},
+  "quantity_weights": {"1": 92, "2": 8},
+  "carriers": [
+    {"name": "UPS", "tracking_prefix": "1Z", "tracking_digits": 16},
+    {"name": "FedEx", "tracking_prefix": "", "tracking_digits": 12},
+    {"name": "USPS", "tracking_prefix": "94", "tracking_digits": 20}
+  ],
+  "tracking_url_template": "https://track.example.com/{carrier}/{tracking_number}",
+  "return_label_url_template": "https://returns.example.com/labels/{return_id}.pdf",
+  "order_id_prefix": "SS",
+  "order_id_start": 10001,
+  "return_id_prefix": "RMA",
+  "return_id_start": 1001,
+  "customer_id_prefix": "cus_",
+  "identity_subject_prefix": "idp|",
+  "fulfilment_hours_range": [4, 30],
+  "transit_days_range": [2, 6],
+  "return_reason_weights": {
+    "too_small": 30, "too_large": 22, "too_narrow": 10, "too_wide": 5,
+    "uncomfortable": 10, "defective": 6, "not_as_described": 5, "changed_mind": 10, "other": 2
+  },
+  "exchange_share_of_returns": 0.45,
+  "return_rejection_rate": 0.05,
+  "return_status_by_age_days": {"in_transit_after": 2, "received_after": 6, "completed_after": 10},
+  "refund_days_after_return_range": [8, 10],
+  "cancellation_hours_after_order_range": [1, 6],
+  "customer_phone_rate": 0.7,
+  "customer_created_days_before_history_range": [1, 365],
+  "product_created_days_ago": 400,
+  "street_number_range": [10, 9999],
+  "email_domain": "example.com"
+}

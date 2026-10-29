@@ -1,0 +1,215 @@
+{
+ "_note": "Approximate conversions. Unisex products use the men's chart. Replace with the company's official chart.",
+ "rows": [
+  {
+   "gender": "women",
+   "us": 5,
+   "uk": 3,
+   "eu": 36,
+   "foot_length_cm": 22
+  },
+  {
+   "gender": "women",
+   "us": 5.5,
+   "uk": 3.5,
+   "eu": 36.5,
+   "foot_length_cm": 22.5
+  },
+  {
+   "gender": "women",
+   "us": 6.0,
+   "uk": 4.0,
+   "eu": 37.0,
+   "foot_length_cm": 23.0
+  },
+  {
+   "gender": "women",
+   "us": 6.5,
+   "uk": 4.5,
+   "eu": 37.5,
+   "foot_length_cm": 23.5
+  },
+  {
+   "gender": "women",
+   "us": 7.0,
+   "uk": 5.0,
+   "eu": 38.0,
+   "foot_length_cm": 24.0
+  },
+  {
+   "gender": "women",
+   "us": 7.5,
+   "uk": 5.5,
+   "eu": 38.5,
+   "foot_length_cm": 24.5
+  },
+  {
+   "gender": "women",
+   "us": 8.0,
+   "uk": 6.0,
+   "eu": 39.0,
+   "foot_length_cm": 25.0
+  },
+  {
+   "gender": "women",
+   "us": 8.5,
+   "uk": 6.5,
+   "eu": 39.5,
+   "foot_length_cm": 25.5
+  },
+  {
+   "gender": "women",
+   "us": 9.0,
+   "uk": 7.0,
+   "eu": 40.0,
+   "foot_length_cm": 26.0
+  },
+  {
+   "gender": "women",
+   "us": 9.5,
+   "uk": 7.5,
+   "eu": 40.5,
+   "foot_length_cm": 26.5
+  },
+  {
+   "gender": "women",
+   "us": 10.0,
+   "uk": 8.0,
+   "eu": 41.0,
+   "foot_length_cm": 27.0
+  },
+  {
+   "gender": "women",
+   "us": 10.5,
+   "uk": 8.5,
+   "eu": 41.5,
+   "foot_length_cm": 27.5
+  },
+  {
+   "gender": "women",
+   "us": 11.0,
+   "uk": 9.0,
+   "eu": 42.0,
+   "foot_length_cm": 28.0
+  },
+  {
+   "gender": "men",
+   "us": 5,
+   "uk": 4,
+   "eu": 38,
+   "foot_length_cm": 23
+  },
+  {
+   "gender": "men",
+   "us": 5.5,
+   "uk": 4.5,
+   "eu": 38.5,
+   "foot_length_cm": 23.5
+  },
+  {
+   "gender": "men",
+   "us": 6.0,
+   "uk": 5.0,
+   "eu": 39.0,
+   "foot_length_cm": 24.0
+  },
+  {
+   "gender": "men",
+   "us": 6.5,
+   "uk": 5.5,
+   "eu": 39.5,
+   "foot_length_cm": 24.5
+  },
+  {
+   "gender": "men",
+   "us": 7.0,
+   "uk": 6.0,
+   "eu": 40.0,
+   "foot_length_cm": 25.0
+  },
+  {
+   "gender": "men",
+   "us": 7.5,
+   "uk": 6.5,
+   "eu": 40.5,
+   "foot_length_cm": 25.5
+  },
+  {
+   "gender": "men",
+   "us": 8.0,
+   "uk": 7.0,
+   "eu": 41.0,
+   "foot_length_cm": 26.0
+  },
+  {
+   "gender": "men",
+   "us": 8.5,
+   "uk": 7.5,
+   "eu": 41.5,
+   "foot_length_cm": 26.5
+  },
+  {
+   "gender": "men",
+   "us": 9.0,
+   "uk": 8.0,
+   "eu": 42.0,
+   "foot_length_cm": 27.0
+  },
+  {
+   "gender": "men",
+   "us": 9.5,
+   "uk": 8.5,
+   "eu": 42.5,
+   "foot_length_cm": 27.5
+  },
+  {
+   "gender": "men",
+   "us": 10.0,
+   "uk": 9.0,
+   "eu": 43.0,
+   "foot_length_cm": 28.0
+  },
+  {
+   "gender": "men",
+   "us": 10.5,
+   "uk": 9.5,
+   "eu": 43.5,
+   "foot_length_cm": 28.5
+  },
+  {
+   "gender": "men",
+   "us": 11.0,
+   "uk": 10.0,
+   "eu": 44.0,
+   "foot_length_cm": 29.0
+  },
+  {
+   "gender": "men",
+   "us": 11.5,
+   "uk": 10.5,
+   "eu": 44.5,
+   "foot_length_cm": 29.5
+  },
+  {
+   "gender": "men",
+   "us": 12.0,
+   "uk": 11.0,
+   "eu": 45.0,
+   "foot_length_cm": 30.0
+  },
+  {
+   "gender": "men",
+   "us": 12.5,
+   "uk": 11.5,
+   "eu": 45.5,
+   "foot_length_cm": 30.5
+  },
+  {
+   "gender": "men",
+   "us": 13.0,
+   "uk": 12.0,
+   "eu": 46.0,
+   "foot_length_cm": 31.0
+  }
+ ]
+}
