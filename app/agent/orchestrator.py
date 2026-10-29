@@ -1,6 +1,6 @@
 """The support agent pipeline (PRD §10.2).
 
-    message → 0 preprocess → 1 classify (strict contract) → 2 validate fields
+    message → 0 preprocess → 1 classify (strict contract) → 1b injection guard → 2 validate fields
             → 3 policy/authorization → 4 execute → 5 respond → 6 output check
 
 Every turn is traced (via the gateway's turn recorder): each stage's input, output, params,
@@ -24,6 +24,7 @@ from app.agent.config_loader import AgentConfig, IntentSpec, get_agent_config
 from app.agent.contracts import Entities, ImageCategory, Sentiment
 from app.agent.handlers import Handlers
 from app.agent.identity import identity_is_valid
+from app.agent.injection_guard import InjectionGuard
 from app.agent.llm import LLMClient, compute_cost
 from app.agent.output_check import check_reply
 from app.agent.policy import PolicyDecision, PolicyEngine
@@ -93,6 +94,7 @@ class SupportAgent:
         self.identity = identity
         self.s = settings or get_settings()
         self.config = config or get_agent_config()
+        self.guard = InjectionGuard(self.config.injection_guard)
         self.now_fn = now_fn
         self.responder = Responder(self.llm, self.s, self.config)
         self.policy = PolicyEngine(commerce, self.s)
@@ -215,10 +217,20 @@ class SupportAgent:
         t.info.update(intent=cls.intent, intent_type=spec.type, classifier_confidence=cls.confidence,
                       sentiment=cls.sentiment.value, entities=cls.entities.model_dump(mode="json", exclude_none=True))
 
-        if cls.injection_suspected:
+        # --- 1b. injection guard: doesn't trust the classifier's own injection flag -----
+        with rec.step(PipelineStage.INJECTION_GUARD,
+                      input={"chars": len(pre.text), "classifier_flagged": cls.injection_suspected},
+                      params={"enabled": self.guard.enabled, "block_threshold": self.guard.threshold}) as st:
+            guard = self.guard.inspect(pre.text, cls)
+            st.output = guard.to_log()
+            if guard.blocked:
+                st.status = StepStatus.SHORT_CIRCUIT
+        if guard.blocked or cls.injection_suspected:
+            techniques = {x.value for x in cls.injection.techniques} | set(guard.techniques)
             return self._escalate(t, EscalationReason.PROMPT_INJECTION, EscalationPriority.HIGH, "injection_detected",
-                                  reason_code="PROMPT_INJECTION",
-                                  error=json.dumps({"techniques": [x.value for x in cls.injection.techniques],
+                                  reason_code="PROMPT_INJECTION" if cls.injection_suspected else "PROMPT_INJECTION_GUARD",
+                                  error=json.dumps({"techniques": sorted(techniques),
+                                                    "guard_findings": [f.id for f in guard.findings],
                                                     "image_instructions": [i.index for i in cls.images if i.contains_instructions]}))
         if any(img.category == ImageCategory.INAPPROPRIATE for img in cls.images):
             return self._finish(t, TurnOutcome.DECLINED, self.config.template("image_inappropriate"))

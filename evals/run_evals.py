@@ -1,5 +1,9 @@
 """Repeatable agent evals against the live model.
 
+    .venv/bin/python -m evals.run_evals --list               # surfaces, what they cover, which files map to them
+    .venv/bin/python -m evals.run_evals --changed            # the surfaces your uncommitted changes touch
+    .venv/bin/python -m evals.run_evals --surface injection cascade
+    .venv/bin/python -m evals.run_evals --release            # unit tests, then every case at release_trials
     .venv/bin/python -m evals.run_evals                      # all cases, EVAL_TRIALS trials
     .venv/bin/python -m evals.run_evals --trials 1 --only PI-01 UA-02
     .venv/bin/python -m evals.run_evals --category prompt_injection
@@ -8,13 +12,17 @@ Each case × trial runs on its own freshly seeded SQLite database, so cases can'
 affect each other and results don't depend on order. Faults (API errors,
 malformed model output, data-layer failures) are injected deterministically.
 
-Writes evals/results/<timestamp>.json and .md, plus evals/results/latest.md.
+Writes evals/results/<timestamp>.json and .md. A run of every case also updates latest.md; a partial run
+(--surface, --changed, --only, --category) writes latest-partial.md instead, so latest.md is always the full picture.
 Exits non-zero if any category falls below its gate in cases.json — usable in CI.
 """
 
 import argparse
 import concurrent.futures as cf
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import traceback
 from collections import defaultdict
@@ -44,6 +52,8 @@ from app.db.models import (
     Turn,
 )
 from app.db.seed import seed
+
+from evals import surfaces as surf
 
 EVAL_DIR = Path(__file__).resolve().parent
 CLASSIFY_SCHEMA = "support_classification"
@@ -138,6 +148,7 @@ def _observe(db, reply) -> dict:
         "stages": [s.stage.value for s in turn.steps],
         "output_check_passed": turn.output_check_passed,
         "quick_replies": len((reply.payload or {}).get("quick_replies") or []),
+        "route": next((s.params.get("route") for s in turn.steps if s.stage.value == "classify"), None),
         "reply": reply.text,
         "turn_id": reply.turn_id,
     }
@@ -177,6 +188,8 @@ def _evaluate(exp: dict, actual: dict, templates: dict) -> list[dict]:
                               text.lower() not in reply.lower()))
     for stage in exp.get("no_stage", []):
         out.append(_criterion("stage not run", stage, actual.get("stages"), stage not in actual.get("stages", [])))
+    if "route" in exp:
+        out.append(_criterion("classifier route", exp["route"], actual.get("route"), actual.get("route") == exp["route"]))
     if "quick_replies_min" in exp:
         out.append(_criterion("quick replies ≥", exp["quick_replies_min"], actual.get("quick_replies"),
                               actual.get("quick_replies", 0) >= exp["quick_replies_min"]))
@@ -279,7 +292,9 @@ def _fmt(v: Any) -> str:
     return text if len(text) <= 90 else text[:87] + "..."
 
 
-def write_report(cases: list[dict], runs: list[CaseRun], gates: dict, trials: int, settings, started: datetime) -> tuple[str, bool]:
+def write_report(cases: list[dict], runs: list[CaseRun], gates: dict, trials: int, settings, started: datetime,
+                 scope: str = "all cases", skipped: list[dict] | None = None,
+                 only_surfaces: list[str] | None = None) -> tuple[str, bool]:
     by_case: dict[str, list[CaseRun]] = defaultdict(list)
     for r in runs:
         by_case[r.case_id].append(r)
@@ -292,8 +307,11 @@ def write_report(cases: list[dict], runs: list[CaseRun], gates: dict, trials: in
         f"- **Run:** {started:%Y-%m-%d %H:%M UTC}",
         f"- **Classifier model:** `{settings.classifier_model}` · **Vision:** `{settings.classifier_vision_model}` · "
         f"**Responder:** `{settings.responder_model}`",
+        f"- **Classifier provider:** `{settings.classifier_provider}`",
         f"- **Prompt version:** `{settings.prompt_version}` · **Policy version:** `{settings.policy_config_version}`",
-        f"- **Trials per case:** {trials} · **Cases:** {len(cases)}", "",
+        f"- **Scope:** {scope}",
+        f"- **Trials per case:** {trials} · **Cases:** {len(cases)}"
+        + (f" · **Skipped:** {', '.join(c['id'] for c in skipped)} (need another classifier provider)" if skipped else ""), "",
         "## Summary", "",
         "| Category | Cases | Trials passed | Pass rate | Gate | Result |",
         "|---|---|---|---|---|---|",
@@ -313,6 +331,17 @@ def write_report(cases: list[dict], runs: list[CaseRun], gates: dict, trials: in
         lines.append(f"| {cat} | {n_cases} | {passed}/{len(cat_runs)} | {rate:.0%} | ≥{gate:.0%} | {'✅ pass' if ok else '❌ FAIL'} |")
     total_pass = sum(r.passed for r in runs)
     lines += ["", f"**Overall:** {total_pass}/{len(runs)} trials passed — suite {'✅ PASSED' if all_ok else '❌ FAILED'}", ""]
+
+    by_surface: dict[str, list[CaseRun]] = defaultdict(list)
+    for c in cases:
+        for sname in c["surfaces"]:
+            if only_surfaces is None or sname in only_surfaces:
+                by_surface[sname].extend(by_case[c["id"]])
+    lines += ["### By surface", "", "| Surface | Cases | Trials passed | Pass rate |", "|---|---|---|---|"]
+    for sname, srs in by_surface.items():
+        lines.append(f"| {sname} | {len({r.case_id for r in srs})} | {sum(r.passed for r in srs)}/{len(srs)} | "
+                     f"{sum(r.passed for r in srs) / len(srs):.0%} |")
+    lines.append("")
 
     lines += ["## Cases", "", "| ID | Case | Trials passed |", "|---|---|---|"]
     for c in cases:
@@ -353,27 +382,101 @@ def write_report(cases: list[dict], runs: list[CaseRun], gates: dict, trials: in
     return "\n".join(lines), all_ok
 
 
+def _print_surfaces(spec: dict) -> None:
+    print(f"{'surface':<11} {'cases':>5}  {'also runs':<22} what it covers / files")
+    for name, sd in spec["surfaces"].items():
+        n = len(surf.cases_for(spec, [name]))
+        print(f"{name:<11} {n:>5}  {', '.join(sd.get('also', [])) or '-':<22} {sd['description']}")
+        print(f"{'':<40} files: {', '.join(sd['paths'])}")
+        print(f"{'':<40} unit tests: {', '.join(sd.get('tests', [])) or '-'}")
+    print(f"\nAny change to {', '.join(spec['run_everything_paths'][:4])}, … or to an unmapped file under app/ "
+          f"or agent_config/ runs every surface.\nCategory gates: {', '.join(f'{k} ≥{v:.0%}' for k, v in spec['gates'].items() if not k.startswith('_'))}")
+
+
 def main() -> None:
-    settings = get_settings()
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--trials", type=int, default=settings.eval_trials)
-    parser.add_argument("--workers", type=int, default=settings.eval_workers)
+    parser.add_argument("--trials", type=int)
+    parser.add_argument("--workers", type=int)
     parser.add_argument("--only", nargs="*", help="case IDs to run")
     parser.add_argument("--category", help="run one category")
+    parser.add_argument("--surface", nargs="+", help="run the cases for these surfaces (see --list)")
+    parser.add_argument("--changed", nargs="?", const="HEAD", metavar="BASE",
+                        help="run the surfaces touched by files changed against BASE (default HEAD, incl. untracked)")
+    parser.add_argument("--release", action="store_true",
+                        help="unit tests, then every case at release_trials trials; the gate for shipping")
+    parser.add_argument("--classifier", help="override CLASSIFIER_PROVIDER for this run (e.g. cascade)")
+    parser.add_argument("--list", action="store_true", help="list surfaces and exit")
     args = parser.parse_args()
 
-    spec = json.loads((EVAL_DIR / "cases.json").read_text())
-    cases = [c for c in spec["cases"]
+    spec = surf.load_spec()
+    if args.list:
+        _print_surfaces(spec)
+        return
+
+    # Decide what to run before settings are read, because a surface may need another classifier.
+    chosen: list[str] | None = None
+    scope = "all cases"
+    if args.surface:
+        chosen = surf.expand(args.surface, spec)
+        scope = f"surfaces {', '.join(chosen)}"
+    if args.changed:
+        files = surf.changed_files(args.changed)
+        chosen, unmapped, forces_all = surf.surfaces_for_files(files, spec)
+        print(f"Changed against {args.changed}: {len(files)} file(s)")
+        for u in unmapped:
+            print(f"  not mapped to a surface (add it to cases.json): {u}")
+        if forces_all:
+            shown = ", ".join(forces_all[:4]) + (f" and {len(forces_all) - 4} more" if len(forces_all) > 4 else "")
+            print(f"  shared or unmapped files changed ({shown}): running every surface")
+            chosen, scope = None, f"all cases (shared files changed against {args.changed})"
+        elif not chosen:
+            print("No changed file belongs to an eval surface; nothing to run.")
+            return
+        else:
+            scope = f"surfaces {', '.join(chosen)} (changed against {args.changed})"
+            print(f"  surfaces: {', '.join(chosen)}")
+    if args.release:
+        chosen, scope = None, "release: all cases"
+        print("Release gate: unit tests first.")
+        if subprocess.run([sys.executable, "-m", "pytest", "-q"], cwd=EVAL_DIR.parent).returncode:
+            raise SystemExit("Unit tests failed; not running evals.")
+
+    needs = {spec["surfaces"][n].get("classifier_provider") for n in (chosen or [])} - {None}
+    provider = args.classifier or (needs.pop() if len(needs) == 1 else None)
+    if provider:
+        os.environ["CLASSIFIER_PROVIDER"] = provider
+        from app.config import get_settings as _gs
+        _gs.cache_clear()
+        print(f"Classifier provider for this run: {provider}")
+
+    settings = get_settings()
+    trials = args.trials or (spec["release_trials"] if args.release else settings.eval_trials)
+    workers = args.workers or settings.eval_workers
+
+    cases = [c for c in surf.cases_for(spec, chosen)
              if (not args.only or c["id"] in args.only) and (not args.category or c["category"] == args.category)]
+    skipped = [c for c in cases if c.get("requires", {}).get("classifier_provider", settings.classifier_provider)
+               != settings.classifier_provider]
+    cases = [c for c in cases if c not in skipped]
+    if skipped:
+        print(f"Skipping {', '.join(c['id'] for c in skipped)}: they need CLASSIFIER_PROVIDER="
+              f"{skipped[0]['requires']['classifier_provider']} (use --classifier, or --surface cascade).")
+    if not cases:
+        raise SystemExit("No cases selected.")
+    partial = bool(args.only or args.category or chosen is not None)
+    if args.only or args.category:
+        scope += " · filtered by --only/--category"
+    if skipped and not partial:
+        scope += f" · {len(skipped)} cases need another classifier"
     templates = json.loads((settings.agent_config_dir / "templates.json").read_text())
     # The agent fills in the company name; compare against the same text.
     templates = {k: v.replace("{brand_name}", settings.brand_name) if isinstance(v, str) else v
                  for k, v in templates.items()}
     started = datetime.now(timezone.utc)
 
-    jobs = [(c, t) for t in range(1, args.trials + 1) for c in cases]
+    jobs = [(c, t) for t in range(1, trials + 1) for c in cases]
     runs: list[CaseRun] = []
-    with cf.ThreadPoolExecutor(max_workers=args.workers) as pool:
+    with cf.ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {pool.submit(run_case, c, t, templates): (c, t) for c, t in jobs}
         for fut in cf.as_completed(futures):
             r = fut.result()
@@ -383,15 +486,18 @@ def main() -> None:
 
     order = {c["id"]: i for i, c in enumerate(cases)}
     runs.sort(key=lambda r: (order[r.case_id], r.trial))
-    report, ok = write_report(cases, runs, spec["gates"], args.trials, settings, started)
+    report, ok = write_report(cases, runs, spec["gates"], trials, settings, started, scope, skipped, chosen)
 
     out = EVAL_DIR / "results"
     out.mkdir(exist_ok=True)
     stamp = started.strftime("%Y%m%dT%H%M%SZ")
     (out / f"{stamp}.md").write_text(report)
-    (out / "latest.md").write_text(report)
+    (out / ("latest-partial.md" if partial else "latest.md")).write_text(report)
     (out / f"{stamp}.json").write_text(json.dumps([r.__dict__ for r in runs], indent=2, default=str))
-    print(f"\nReport: {out / 'latest.md'}")
+    print(f"\nReport: {out / ('latest-partial.md' if partial else 'latest.md')}")
+    if chosen:
+        tests = surf.unit_tests_for(spec, chosen)
+        print(f"Also run the unit tests for these surfaces: pytest -q {' '.join(tests)}")
     print("SUITE PASSED" if ok else "SUITE FAILED")
     raise SystemExit(0 if ok else 1)
 

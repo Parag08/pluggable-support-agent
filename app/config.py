@@ -73,6 +73,10 @@ class Settings(BaseSettings):
     classifier_min_confidence_write: float
     classifier_history_messages: int
     classifier_max_entity_chars: int
+    # CLASSIFIER_PROVIDER=cascade: the local model answers only at or above this confidence,
+    # and only for messages up to this many characters.
+    cascade_min_confidence: float
+    cascade_max_chars: int
 
     responder_model: str
     responder_max_tokens: int

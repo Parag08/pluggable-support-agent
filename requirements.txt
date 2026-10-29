@@ -7,6 +7,7 @@ httpx>=0.27      # HTTP/JSON commerce adapter
 fastapi>=0.115    # HTTP API (app/server) and the demo
 uvicorn>=0.30
 PyJWT[crypto]>=2.8  # signed-JWT identity adapter
+scikit-learn>=1.4  # CLASSIFIER_PROVIDER=cascade (local model)
 anthropic>=2.3    # LLM_PROVIDER=anthropic (optional otherwise)
 pillow>=10.1  # evals/make_assets.py only
 playwright>=1.45  # demo/capture.py only (screenshots)

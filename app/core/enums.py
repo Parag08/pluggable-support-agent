@@ -111,6 +111,7 @@ class IntentType(StrEnum):
 class PipelineStage(StrEnum):
     PREPROCESS = "preprocess"
     CLASSIFY = "classify"
+    INJECTION_GUARD = "injection_guard"
     VALIDATE = "validate"
     POLICY = "policy"
     EXECUTE = "execute"
