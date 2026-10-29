@@ -69,8 +69,8 @@ def test_public_size_advice_is_answered_and_fully_traced(agent, chat, llm, seede
     assert turn.intent == "size_advice" and turn.classifier_confidence == 0.95
     assert turn.handler == "size_advice" and turn.output_check_passed is True
     assert stages(seeded_db, r.turn_id) == [
-        PipelineStage.PREPROCESS, PipelineStage.CLASSIFY, PipelineStage.VALIDATE, PipelineStage.POLICY,
-        PipelineStage.EXECUTE, PipelineStage.RESPOND, PipelineStage.OUTPUT_CHECK,
+        PipelineStage.PREPROCESS, PipelineStage.CLASSIFY, PipelineStage.INJECTION_GUARD, PipelineStage.VALIDATE,
+        PipelineStage.POLICY, PipelineStage.EXECUTE, PipelineStage.RESPOND, PipelineStage.OUTPUT_CHECK,
     ]
     execute = next(s for s in turn.steps if s.stage == PipelineStage.EXECUTE)
     assert execute.output["recommended_size_us"] == "7.5"
