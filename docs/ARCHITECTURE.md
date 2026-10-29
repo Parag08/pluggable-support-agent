@@ -106,6 +106,7 @@ flowchart TB
 |---|---|---|
 | Pipeline | [`app/agent/`](../app/agent/) | Done: imports no adapter, database or vendor SDK (enforced by `tests/test_agent_boundary.py`) |
 | Company data | `CommercePort` ([`app/ports/commerce.py`](../app/ports/commerce.py)) | Done: `sql_reference` (demo schema) and `http_json` (any system speaking the JSON-over-HTTP contract). Shopify: planned |
+| Injection guard | [`app/agent/injection_guard.py`](../app/agent/injection_guard.py) + [`agent_config/injection_guard.json`](../agent_config/injection_guard.json) | Done: deterministic, runs after the classifier on the raw text and the extracted entities (stage `injection_guard`); does not trust the classifier's own flag. Edit patterns/threshold in the JSON |
 | Classifier | `ClassifierPort` ([`app/ports/classifier.py`](../app/ports/classifier.py)) | Done: `llm_oneshot`. Any other classifier plugs in via `CLASSIFIER_PROVIDER` |
 | Identity | `IdentityPort` + [`app/auth/`](../app/auth/) | Done: `signed_jwt` (single-use tokens, audited) and a dev-only adapter. OIDC + PKCE: planned |
 | Escalation | `HandoffPort` | Done: `local` and `email`. Zendesk / Freshdesk: planned |
