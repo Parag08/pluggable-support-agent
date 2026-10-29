@@ -37,6 +37,7 @@ class AgentConfig:
     responder_prompt: str
     redaction: dict[str, Any]
     output_check: dict[str, Any]
+    injection_guard: dict[str, Any]
     policies: dict[str, Any]
     product_matching: dict[str, Any]
     pricing: dict[str, dict[str, str]] = field(default_factory=dict)
@@ -84,6 +85,7 @@ def load_agent_config(settings: Settings) -> AgentConfig:
         responder_prompt=branded((d / "prompts" / "responder.md").read_text(encoding="utf-8")),
         redaction=_read_json(d / "redaction.json"),
         output_check=_read_json(d / "output_check.json"),
+        injection_guard=_read_json(d / "injection_guard.json"),
         policies={k: v for k, v in _read_json(d / "policies.json").items() if not k.startswith("_")},
         product_matching=product_matching,
         pricing=pricing,
