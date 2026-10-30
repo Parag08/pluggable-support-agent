@@ -611,10 +611,12 @@ Defences are layered so that no single check has to be perfect.
 Fixed after the baseline run:
 - **TF-06:** a failure right after writing a return left the return in the database while the customer was told it failed. Originally fixed by rolling the write back; since a company's system can't be rolled back, it is now handled by idempotent retries: the lost answer is recovered by retrying with the same key, and exactly one return exists. TF-08 covers the other side (the service stays down: nothing is written and a person is told the outcome is uncertain).
 - **UA-04:** the agent asked for item details on another customer's order instead of denying it. Now it denies immediately.
+- **CP-07:** for an out-of-window return, the agent asked for the return reason before denying (failed every trial). The policy stage now runs the return/exchange eligibility rules as soon as the customer's order is known (`PolicyEngine.precheck_eligibility`), so an ineligible request is denied before any further question. Regression tests in `tests/test_agent.py`.
+- **MI-01:** the extra-confidence check for write intents (`CLASSIFIER_MIN_CONFIDENCE_WRITE`) ran before anything else, so "I need to return something" at confidence 0.82 got "do you want to return an item?" instead of a request for the order number. The check now runs only just before policy, i.e. before a confirmation card could be shown; asking for a missing field is harmless and goes first, and the fields collected so far are kept when the customer confirms the intent. Regression tests in `tests/test_agent.py`.
+
+Not yet re-run against the live LLM: both fixes are covered by offline tests; the next eval run should confirm CP-07 and MI-01 pass.
 
 Still open:
-- **CP-07:** for an out-of-window return, the agent asks for the return reason before denying (fails every trial). Eligibility should be checked before asking for more details.
-- **MI-01:** the extra-confidence check for write intents sometimes asks "do you want to return an item?" instead of asking for the order number.
 - **MI-02:** the classifier occasionally gives zero confidence to a vague size question and asks a clarifying question instead.
 
 Current results, per category and per surface, are in [section 7 (Evals)](#7-evals); the table that used to be here is gone so there is one source of truth.
