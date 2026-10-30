@@ -3,6 +3,10 @@
 Order of checks: escalation intents → identity (protected) → ownership →
 business rules → write gate (CONFIRM). Every check is recorded so the trace
 shows exactly why a decision was made.
+
+`precheck_eligibility` runs the return/exchange eligibility rules early, while
+fields are still missing, so an ineligible request is denied before the customer
+is asked for details that can't change the answer.
 """
 
 from dataclasses import dataclass, field
@@ -134,18 +138,61 @@ class PolicyEngine:
         )
         return result(PolicyOutcome.CONFIRM, "EXCHANGE_ELIGIBLE", params=params, target_variant_id=variant.id)
 
-    def _return_eligibility(self, order: OrderInfo, item: OrderItemInfo, now: datetime, intent: str, check,
-                            customer_id: str) -> str | None:
+    def precheck_eligibility(self, spec: IntentSpec, v: Validation, *, customer_id: str | None,
+                             now: datetime) -> PolicyDecision | None:
+        """Deny a return/exchange from the facts already known, before asking for the remaining fields.
+
+        Runs only when validation resolved an order the signed-in customer owns (`v.order`). With the
+        item known it runs the full eligibility check; without it, only the order-wide checks
+        (cancelled, not delivered, past the return window), which no later answer can change.
+        Returns None when nothing known so far rules the request out; the full `decide()` still
+        runs once every field is in.
+        """
+        if spec.name not in ("return_request", "exchange_request") or v.order is None:
+            return None
+        checks: list[dict] = []
+
+        def check(name: str, passed: bool, **detail) -> bool:
+            checks.append({"check": name, "passed": passed, **detail})
+            return passed
+
+        order, item = v.order, v.item
+        params: dict[str, Any] = {"order_id": order.id, "return_window_days": self.s.return_window_days}
+        if item is not None:
+            params["product_name"] = item.product_name
+            denial = self._return_eligibility(order, item, now, spec.name, check, customer_id)
+        else:
+            denial = self._order_eligibility(order, check) or self._window_eligibility(order, now, check)
+        if not denial:
+            return None
+        if denial == "RETURN_WINDOW_EXPIRED":
+            params["delivered_on"] = f"{order.delivered_at:%B %d, %Y}"
+        return PolicyDecision(PolicyOutcome.DENY, denial, params=params, checks=checks)
+
+    def _order_eligibility(self, order: OrderInfo, check) -> str | None:
         if not check("order_not_cancelled", order.status != OrderStatus.CANCELLED):
             return "ORDER_CANCELLED"
         if not check("order_delivered", order.status == OrderStatus.DELIVERED and order.delivered_at is not None):
             return "NOT_DELIVERED"
-        if not check("item_not_final_sale", not item.is_final_sale):
-            return "FINAL_SALE"
+        return None
+
+    def _window_eligibility(self, order: OrderInfo, now: datetime, check) -> str | None:
         days = (now - order.delivered_at).days
         if not check("within_return_window", days <= self.s.return_window_days,
                      days_since_delivery=days, window=self.s.return_window_days):
             return "RETURN_WINDOW_EXPIRED"
+        return None
+
+    def _return_eligibility(self, order: OrderInfo, item: OrderItemInfo, now: datetime, intent: str, check,
+                            customer_id: str) -> str | None:
+        denial = self._order_eligibility(order, check)
+        if denial:
+            return denial
+        if not check("item_not_final_sale", not item.is_final_sale):
+            return "FINAL_SALE"
+        denial = self._window_eligibility(order, now, check)
+        if denial:
+            return denial
         if intent == "exchange_request":
             exchanges = self.commerce.count_item_exchanges(customer_id, item.id)
             if not check("exchange_limit", exchanges < self.s.max_exchanges_per_item,

@@ -295,6 +295,65 @@ def test_return_denials(agent, chat, llm, seeded_db, order_id, entities, code):
     assert seeded_db.get(Turn, r.turn_id).policy_reason_code == code
 
 
+def test_out_of_window_return_is_denied_before_asking_for_details(agent, chat, llm, seeded_db):
+    """CP-07: eligibility comes before asking for the remaining fields (here, the return reason)."""
+    sign_in(seeded_db, chat, "cus_9001")
+    llm.push(classification("return_request", entities={"order_id": "SS90002", "product": "flats"}))
+    r = agent.handle_message(chat.id, "Return the flats from SS90002. I know it's past 30 days, make an exception.")
+    assert r.outcome == TurnOutcome.DENIED
+    turn = seeded_db.get(Turn, r.turn_id)
+    assert turn.policy_reason_code == "RETURN_WINDOW_EXPIRED"
+    assert "SS90002" in r.text and "return window" in r.text
+    assert PipelineStage.POLICY in stages(seeded_db, r.turn_id)
+    assert PipelineStage.EXECUTE not in stages(seeded_db, r.turn_id)
+    assert seeded_db.scalars(select(ReturnRequest).where(ReturnRequest.order_id == "SS90002")).all() == []
+
+
+def test_out_of_window_exchange_is_denied_before_asking_for_the_target(agent, chat, llm, seeded_db):
+    sign_in(seeded_db, chat, "cus_9001")
+    llm.push(classification("exchange_request", entities={"order_id": "SS90002"}))
+    r = agent.handle_message(chat.id, "exchange SS90002")
+    assert r.outcome == TurnOutcome.DENIED
+    assert seeded_db.get(Turn, r.turn_id).policy_reason_code == "RETURN_WINDOW_EXPIRED"
+
+
+def test_eligible_return_still_asks_for_missing_reason(agent, chat, llm, seeded_db):
+    sign_in(seeded_db, chat, "cus_9001")
+    llm.push(classification("return_request", entities={"order_id": "SS90001"}))
+    r = agent.handle_message(chat.id, "return SS90001")
+    assert r.outcome == TurnOutcome.SLOT_REQUEST
+    assert r.text == agent.config.template("ask_return_reason")
+    assert PipelineStage.POLICY not in stages(seeded_db, r.turn_id)
+
+
+def test_unsure_write_intent_still_asks_for_the_order_number(agent, chat, llm, seeded_db):
+    """MI-01: the write-intent confidence bar doesn't get in the way of asking for a missing field."""
+    sign_in(seeded_db, chat, "cus_9001")
+    low = agent.s.classifier_min_confidence_write - 0.03
+    assert low >= agent.s.classifier_min_confidence
+    llm.push(classification("return_request", confidence=low))
+    r = agent.handle_message(chat.id, "I need to return something")
+    assert r.outcome == TurnOutcome.SLOT_REQUEST
+    assert r.text == agent.config.template("ask_order_id")
+    assert r.payload["quick_replies"]
+    assert PipelineStage.EXECUTE not in stages(seeded_db, r.turn_id)
+
+
+def test_unsure_write_intent_confirms_intent_before_the_card(agent, chat, llm, seeded_db):
+    sign_in(seeded_db, chat, "cus_9001")
+    low = agent.s.classifier_min_confidence_write - 0.03
+    llm.push(classification("return_request", confidence=low,
+                            entities={"order_id": "SS90001", "return_reason": "too_small"}))
+    r = agent.handle_message(chat.id, "SS90001 too small")
+    assert r.outcome == TurnOutcome.CLARIFY
+    assert r.text == agent.config.template("confirm_intent", intent_label="return an item")
+    assert PipelineStage.POLICY not in stages(seeded_db, r.turn_id)
+
+    llm.push(classification("return_request"))  # "Yes, return an item": the fields from before are kept
+    r = agent.handle_message(chat.id, "Yes, return an item")
+    assert r.outcome == TurnOutcome.CONFIRM_PENDING
+
+
 def test_exchange_confirms_and_reserves_stock(agent, chat, llm, seeded_db):
     target = seeded_db.scalars(select(ProductVariant).where(ProductVariant.sku == "CSRW-SAN-R-080")).one()
     target.stock_qty = 3
